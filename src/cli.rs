@@ -15,15 +15,18 @@ pub enum Commands {
         /// Path to the .wasm file (Required)
         path: String,
 
+        #[arg(short, long, default_value = "add")]
+        function: String,
+
         /// Memory limit in MB (Defaults to 10 if not provided)
         #[arg(short, long, default_value_t = 10)]
         memory: usize,
 
         /// Fuel limit (Defaults to 10,000 if not provided)
-        #[arg(short, long, default_value_t = 10000)]
+        #[arg(long, default_value_t = 10000)]
         fuel: u64,
 
-        #[arg(value_name = "ARGS")]
+        #[arg(num_args = 1..)]
         args: Vec<i32>,
     },
 }
