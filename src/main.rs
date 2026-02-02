@@ -1,19 +1,26 @@
+use cli::Cli;
+use clap::Parser;
+
+mod cli;
 mod executor;
 mod limiter;
 
 fn main() -> anyhow::Result<()> {
-    println!("--- xAI Sandbox Prototype ---");
+    // 1. We call parse to get the data from the user
+    let cli = Cli::parse();
 
-    // Hardcoded values for testing before we finish cli.rs
-    let file_path = "add.wasm";
-    let function = "add";
-    let input = (10, 20);
-    let memory_limit = 10 * 1024 * 1024; // 10MB
-    let fuel_limit = 10_000;
+    // 2. We match on the command to see what the user wants to do
+    match cli.command {
+        cli::Commands::Run { path, memory, fuel } => {
+            // Here, 'path' is a String, 'memory' is a usize, etc.
 
-    match executor::run_wasm(file_path, function, input, memory_limit, fuel_limit) {
-        Ok(res) => println!("Success! Result: {}", res),
-        Err(e) => eprintln!("Sandbox Error: {}", e),
+            // At xAI, we care about units!
+            // Our CLI takes 'memory' in MB, but our executor wants Bytes.
+            let memory_in_bytes = memory * 1024 * 1024;
+
+            // Now we call our executor with the REAL data
+            executor::run_wasm(&path, "add", (5, 10), memory_in_bytes, fuel)?;
+        }
     }
 
     Ok(())

@@ -4,7 +4,7 @@ use wasmtime::*;
 pub fn run_wasm(
     file_path: &str,
     func_name: &str,
-    args: (i32, i32),
+    args: Vec<i32>,
     mem_limit: usize,
     fuel_limit: u64,
 ) -> anyhow::Result<i32> {
@@ -49,17 +49,22 @@ pub fn run_wasm(
     // dish is cooked, now we need to find the specific part we want to eat.
 
     // get function from the instance.
-    let add = instance.get_typed_func::<(i32, i32), i32>(&mut store, "add")?;
+    let func = instance.get_func::(&mut store, func_name).ok_or(anyhow::anyhow!("Function not found"))?;
 
+    let wasm_args: Vec<Val> = args.iter().map(|&arg| Val::I32(arg)).collect();
+
+    let mut result = [Val::I32(0)];
+
+    func.call(&mut store, &wasm_args, &mut result)?;
     // call the function with the arguments.
-    let result = add.call(&mut store, (5, 10))?;
+    // let result = add.call(&mut store, (5, 10))?;
 
-    // Check the fuel
-    let remaining = store.get_fuel()?;
-    let consumed = 10_000 - remaining;
-    println!("Fuel consumed: {}", consumed);
+    // // Check the fuel
+    // let remaining = store.get_fuel()?;
+    // let consumed = 10_000 - remaining;
+    // println!("Fuel consumed: {}", consumed);
 
-    // print the result.
-    println!("Result: {}", result);
-    Ok(result)
+    // // print the result.
+    // println!("Result: {}", result);
+    Ok(0)
 }
