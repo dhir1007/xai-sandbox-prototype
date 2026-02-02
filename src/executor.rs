@@ -6,7 +6,6 @@ pub struct ExectionReport {
     pub fuel_consumed: u64,
     pub memory_consumed: usize,
     pub time_consumed: u64,
-    pub error: Option<anyhow::Error>,
 }
 pub fn run_wasm(
     file_path: &str,
@@ -90,6 +89,5 @@ pub fn run_wasm(
         fuel_consumed: fuel_consumed,
         memory_consumed: mem_limit,
         time_consumed: duration.as_nanos() as u64,
-        error: None,
     })
 }
